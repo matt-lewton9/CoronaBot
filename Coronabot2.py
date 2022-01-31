@@ -35,6 +35,12 @@ async def rando(ctx):
 
     await channel.send(f'Remember "{messages[random.randint(0, len(messages)-1)].content}"???') #send random message
 
+@bot.command(hidden = True) #Manual mode, have the bot say whatever I say
+async def m(ctx, *args):
+    tgt_channel = int(args[0]) #channel to send message to
+    text = makeString(args[1:]) #make text string
+    await ctx.guild.channels[tgt_channel].send(text) #send message
+
 @bot.event
 async def on_message(message): #scan message
     

@@ -16,10 +16,8 @@ class Sounds(commands.Cog):
         
         text = makeString(args)
 
-
         filename = "tts.mp3" #make mp3 filename
         tts(text, filename) #make audiofile
-        
 
         audio_source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(executable="C:/Users/black/ffmpeg/bin/ffmpeg.exe", source=filename))
 
