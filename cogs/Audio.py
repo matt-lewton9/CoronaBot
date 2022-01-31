@@ -32,7 +32,7 @@ class Sounds(commands.Cog):
     async def play(self, ctx, *args):
         voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild) #get voice client
         if voice == None: #if voice client doesn't exist, print error message
-            await ctx.guild.channels[-1].send("I am not in the call!!!")
+            await ctx.send("I am not in the call!!!")
         else:
             if voice.is_playing(): #stop audio currently being played
                 voice.stop()
@@ -53,13 +53,13 @@ class Sounds(commands.Cog):
         file_string = "" #string of filenames
         for file in files: # add newlines between the filenames
             file_string += file + "\n"
-        await ctx.guild.channels[-1].send(f"**Soundboard Files**:```\n{file_string}```") #send filenames   
+        await ctx.send(f"**Soundboard Files**:```\n{file_string}```") #send filenames   
 
     @commands.command(brief = 'Leave voice call') #leave call
     async def leave(self, ctx, description='Leave VC'):
         voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild) #get voice client
         await voice.disconnect() #disconnect voice client
-        await ctx.guild.channels[-1].send("Farewell Comrades :flag_al:") #send leaving message
+        await ctx.send("Farewell Comrades :flag_al:") #send leaving message
 
     @commands.command(brief = 'Stop audio playing') #stop audio
     async def stop(self, ctx):

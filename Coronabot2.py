@@ -7,6 +7,7 @@ from coronaHelper import *
 import os
 from dotenv import load_dotenv
 
+ANDROIDS = 11 #channel # for androids
 
 load_dotenv() #load env file
 TOKEN = os.getenv("TOKEN") #get token from .env file
@@ -31,9 +32,8 @@ async def rando(ctx):
     channel = ctx.guild.text_channels[4] #get quotes channel (4)
     async for message in channel.history(limit=message_limit): #get messages
         messages.append(message)
-    channel = ctx.guild.channels[-1]
 
-    await channel.send(f'Remember "{messages[random.randint(0, len(messages)-1)].content}"???') #send random message
+    await ctx.channel.send(f'Remember "{messages[random.randint(0, len(messages)-1)].content}"???') #send random message
 
 @bot.command(hidden = True) #Manual mode, have the bot say whatever I say
 async def m(ctx, *args):
@@ -56,8 +56,7 @@ async def on_message(message): #scan message
     ### Bad Ellie... ###
     if message.author.discriminator == "0773":
             if ellieChecker(message):
-                channel = guild.text_channels[-1] #switch channel to androids
-                await channel.send("Dear FBI, Consider this a disclamer that we are fully aware Ellie is a minor and any implications that may have.")
+                await ctx.channel.send("Dear FBI, Consider this a disclamer that we are fully aware Ellie is a minor and any implications that may have.")
     
     ### Dadbot ###
     dad_joke = dad(message.content)
