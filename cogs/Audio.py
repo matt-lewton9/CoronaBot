@@ -63,20 +63,10 @@ class Sounds(commands.Cog):
         await voice.disconnect() #disconnect voice client
         await ctx.guild.channels[-1].send("Farewell Comrades :flag_al:") #send leaving message
 
-    @commands.command(brief = 'Pause audio playing') #pause audio
-    async def pause(self, ctx):
-        voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild) #get voice client
-        await voice.pause() #pause audio
-
     @commands.command(brief = 'Stop audio playing') #stop audio
     async def stop(self, ctx):
         voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild) #get voice client
         await voice.stop() #stop audio
-
-    @commands.command(brief = 'Resume audio playing') #resume audio
-    async def resume(self, ctx):
-        voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild) #get voice client
-        await voice.resume() #resume audio
 
 def setup(bot):
     bot.add_cog(Sounds(bot))

@@ -12,7 +12,7 @@ class Musica(commands.Cog):
         self.queue = [] #empty queue
         self.now_playing = "None" #init no song playing
 
-    @commands.command(brief='Play song from Youtube, or add it to the Queue', aliases=['play'])
+    @commands.command(brief='Play song from Youtube, or add it to the Queue')
     async def p(self, ctx, *args):
         voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild) #get voice client
         if voice == None: #if voice client doesn't exist, print error message
@@ -69,13 +69,6 @@ class Musica(commands.Cog):
         else:
             embed = embedBuilder(title=f'**Now Playing: {self.now_playing["title"]}**\n{self.now_playing["webpage"]}', url=self.now_playing['webpage'])#make embed
         await ctx.send(embed = embed) #send embed
-
-    @commands.command(brief = 'Leave voice call') #leave call
-    async def leave(self, ctx, description='Leave VC'):
-        voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild) #get voice client
-        await voice.disconnect() #disconnect voice client
-        embed = embedBuilder(title="Farewell Comrades :flag_al:", url="https://www.youtube.com/watch?v=Yg03q100E4g")#make embed
-        await ctx.guild.channels[-1].send(embed = embed) #send leaving message
 
     @commands.command(brief = 'Pause audio playing') #pause audio
     async def pause(self, ctx):
