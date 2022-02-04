@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from showerHelper import *
 import os
+import time
 
 GREEN= 0x00D31F #hexidecimal color code constants
 QUEUE_LEN = 32 #Max number of songs that an be queued
@@ -67,7 +68,8 @@ class Musica(commands.Cog):
         if self.now_playing == 'None':
             embed = embedBuilder(title='**Now Playing**', description="None") #if nothing is playing, np is none
         else:
-            embed = embedBuilder(title=f'**Now Playing: {self.now_playing["title"]}**\n{self.now_playing["webpage"]}', url=self.now_playing['webpage'])#make embed
+            timeElapsed = int(time.time() - self.now_playing["start_time"]) #calculate time elapsed
+            embed = embedBuilder(title=f'**Now Playing: {self.now_playing["title"]}**\n{self.now_playing["webpage"]},\n{timeFormat(timeElapsed)} / {timeFormat(self.now_playing["duration"])} Elapsed', url=self.now_playing['webpage'])#make embed
         await ctx.send(embed = embed) #send embed
 
     @commands.command(brief = 'Pause audio playing') #pause audio
@@ -99,7 +101,7 @@ class Musica(commands.Cog):
         if len(self.queue) == 0: #if queue is empty, say so
             await ctx.send("Queue is empty")
             self.now_playing = 'None'
-            await self.leave(ctx)
+            await voice.disconnect(ctx) #leave call
         else:
             if not voice.is_playing():
                 self.now_playing = self.queue[0] #set now playing
@@ -107,6 +109,7 @@ class Musica(commands.Cog):
                 audio_source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(executable="C:/Users/black/ffmpeg/bin/ffmpeg.exe", source=self.now_playing['audio'])) #get audio source
                 voice.play(audio_source, after = lambda error: self.bot.loop.create_task(self.play_next(ctx))) #play file
                 embed = embedBuilder(title="Now Playing:", fields=[[self.now_playing['title'], self.now_playing['webpage'], False]]) #create embedded message
+                self.now_playing["start_time"] = time.time() #set start time for song
                 await ctx.send(embed = embed) #send embed message
 
 def setup(bot): #set up cog
