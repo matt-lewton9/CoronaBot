@@ -45,7 +45,7 @@ class Sounds(commands.Cog):
                 if not voice.is_playing():
                     voice.play(audio_source, after = None) #play file
             else:
-                await ctx.guild.channels[-1].send("Impossible. Perhaps the archives are incomplete.") #if it doesn't exist, play error message
+                await ctx.send("Impossible. Perhaps the archives are incomplete.") #if it doesn't exist, play error message
 
     @commands.command(brief = 'Display list of current sound files')
     async def soundboard(self, ctx):

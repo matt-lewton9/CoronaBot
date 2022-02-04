@@ -6,6 +6,7 @@ from icecream import ic
 from coronaHelper import *
 import os
 from dotenv import load_dotenv
+from datetime import datetime
 
 ANDROIDS = 11 #channel # for androids
 
@@ -33,17 +34,22 @@ async def rando(ctx):
     async for message in channel.history(limit=message_limit): #get messages
         messages.append(message)
 
-    await ctx.channel.send(f'Remember "{messages[random.randint(0, len(messages)-1)].content}"???') #send random message
+    await ctx.channel.send(f'Remember "{messages[random.randint(0, len(messages)-1)].content}"') #send random message
 
 @bot.command(hidden = True) #Manual mode, have the bot say whatever I say
 async def m(ctx, *args):
-    tgt_channel = int(args[0]) #channel to send message to
-    text = makeString(args[1:]) #make text string
-    await ctx.guild.channels[tgt_channel].send(text) #send message
+
+    try:
+        tgt_channel = ctx.guild.text_channels[int(args[0])] #make tgt channel specified 1st chatacter
+        text = makeString(args[1:]) #make text string ignoring first item
+        await tgt_channel.send(text) #send message
+        
+    except:
+        await ctx.send("Channel number required you loser\nhttps://tenor.com/view/wrong-incorrect-youre-wrong-dr-cox-gif-16095497") #send error message without channel number
 
 @bot.event
 async def on_message(message): #scan message
-    
+
     if message.author == bot.user: #do not respond to self
         return
 
@@ -56,7 +62,7 @@ async def on_message(message): #scan message
     ### Bad Ellie... ###
     if message.author.discriminator == "0773":
             if ellieChecker(message):
-                await ctx.channel.send("Dear FBI, Consider this a disclamer that we are fully aware Ellie is a minor and any implications that may have.")
+                await message.channel.send("Dear FBI, Consider this a disclamer that we are fully aware Ellie is a minor and any implications that may have.")
     
     ### Dadbot ###
     dad_joke = dad(message.content)
