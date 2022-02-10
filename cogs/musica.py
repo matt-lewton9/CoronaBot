@@ -41,7 +41,7 @@ class Musica(commands.Cog):
             i = 0 #song counter
             for song in self.queue:
                 i += 1 #append to song counter
-                fields.append([f"{i}: {song['title']}", song['webpage'], False]) #add to fields array
+                fields.append([f"{i}: {song['title']} ({timeFormat(song['duration'])})", song['webpage'], False]) #add to fields array
             embed = embedBuilder(title="Queue", fields=fields)#make embed with filds
         else:
             embed = embedBuilder(title="Queue", description="None")#make embed for empty queue
