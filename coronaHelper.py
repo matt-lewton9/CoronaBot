@@ -59,13 +59,11 @@ def dad(msg):
 
     words = msg.lower().split()
     im = ["i'm", 'im']
-    for i in im:
-        if i in words:
+    for i in words:
+        if i in im:
             im_int = words.index(i)
-            if words[im_int+1] == 'a': 
+            if words[im_int+1] in ['a', 'an', 'the']: 
                 output = "Hi " + words[im_int+2] + ", I'm dad."
-            elif words[im_int+1] == 'the':
-                output ="Hi the " + words[im_int+2] + ", I'm dad."
             else:
                 output = "Hi " + words[im_int+1] + ", I'm dad."
     return output

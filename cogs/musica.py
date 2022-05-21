@@ -123,20 +123,22 @@ class Musica(commands.Cog):
 
     async def play_next(self, ctx): #play next song in queue
         voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild) #get voice client
-
+        
         if len(self.queue) == 0: #if queue is empty, say so
             await ctx.send("Queue is empty")
             self.now_playing = 'None'
-            await voice.disconnect() #leave call
-        else:
-            if not voice.is_playing():
-                self.now_playing = self.queue[0] #set now playing
-                self.queue.pop(0) #remove song from queue
-                audio_source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(executable="C:/Users/black/ffmpeg/bin/ffmpeg.exe", source=self.now_playing['audio'])) #get audio source
-                voice.play(audio_source, after = lambda error: self.bot.loop.create_task(self.play_next(ctx))) #play file
-                embed = embedBuilder(title="Now Playing:", fields=[[self.now_playing['title'], self.now_playing['webpage'], False]]) #create embedded message
-                self.now_playing["start_time"] = time.time() #set start time for song
-                await ctx.send(embed = embed) #send embed message
+            #await voice.disconnect() #leave call
+
+        #else:
+        if not voice.is_playing():
+            self.now_playing = self.queue[0] #set now playing
+            self.queue.pop(0) #remove song from queue
+            #ic(self.now_playing['audio'])
+            audio_source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(executable="C:/Users/black/ffmpeg/bin/ffmpeg.exe", source=self.now_playing['audio'])) #get audio source
+            voice.play(audio_source, after = lambda error: self.bot.loop.create_task(self.play_next(ctx))) #play file
+            embed = embedBuilder(title="Now Playing:", fields=[[self.now_playing['title'], self.now_playing['webpage'], False]]) #create embedded message
+            self.now_playing["start_time"] = time.time() #set start time for song
+            await ctx.send(embed = embed) #send embed message
 
 def setup(bot): #set up cog
     bot.add_cog(Musica(bot))

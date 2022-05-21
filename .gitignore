@@ -3,3 +3,5 @@ audio/
 __pycache__
 *.mp3
 .gitignore
+rail.txt
+rail.py
