@@ -2,12 +2,12 @@ import discord
 from discord.utils import get
 from icecream import ic
 import youtube_dl
+import json
 
-def get_song(query):
-    ytdl_format_options = {
+#format options are global
+ytdl_format_options = {
         'format': 'bestaudio/best',
         'restrictfilenames': True,
-        'noplaylist': True,
         'key': 'FFmpegExtractAudio',
         'extractaudio': True,
         'audioformat': 'mp3',
@@ -17,25 +17,77 @@ def get_song(query):
         'quiet': True,
         'no_warnings': True,
         'default_search': 'auto',
-        'source_address': '0.0.0.0' # bind to ipv4 since ipv6 addresses cause issues sometimes
+        'source_address': '0.0.0.0', # bind to ipv4 since ipv6 addresses cause issues sometimes
+        'nooverwrites': True
         }
-    ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
+
+def get_song(query):
+    
+    tmpFormat = ytdl_format_options.copy()
+    tmpFormat['noplaylist'] = True #no playlists in search results options
+
+    if "https" in query: #remove playlist from url
+        query = query[0:query.find('&')]
+
+    ytdl = youtube_dl.YoutubeDL(tmpFormat)
     info = ytdl.extract_info(query, download=False)
     
     url = {} #make url object to store info abt video
-    if info['_type'] == 'playlist': #if it is a playlist pick the top one
-        url['audio'] =  info['entries'][0]['url'] #get vid url
-        url['title'] =  info['entries'][0]['title'] #get vid title
-        url['webpage'] = info['entries'][0]['webpage_url'] #get vid title
-        url['duration'] = info['entries'][0]['duration'] #get vid duration
-    else:
-        url['audio'] =  info['entries']['url'] #get vid url
-        url['title'] =  info['entries']['title'] #get vid title
-        url['webpage'] = info['entries']['webpage_url'] #get vid title
-        url['duration'] = info['entries'][0]['duration'] #get vid duration
+
+    ic(query)
+
+    try:
+        song = info['entries'][0]
+    except:
+        song = info['entries']
+
+    url['audio'] =  song['url'] #get vid url
+    url['title'] =  song['title'] #get vid title
+    url['webpage'] = song['webpage_url'] #get vid title
+    url['duration'] = song['duration'] #get vid duration
 
     return url #return url with vid info
+
+def getPlaylistItems(input_url, qLen, songNums):
+
+    #format song numbers
+    if "-" not in songNums: #if only starting number is given 
+        songNums = int(songNums)
+        songNums = f"{songNums}-{songNums+qLen-1}"
     
+    tmp = songNums.split("-") #adjusts range to max at q length limit
+    start, end = [int(tmp[0]), int(tmp[1])]
+    if end-start > qLen:
+        songNums = f"{start}-{start+qLen-1}"
+
+    tmpFormat = ytdl_format_options.copy()
+    tmpFormat['playlist_items'] = songNums #add song numbers to format options
+    tmpFormat['noplaylist'] = False #no playlists in search results options
+
+    ytdl = youtube_dl.YoutubeDL(tmpFormat) #api request
+    info = ytdl.extract_info(input_url, download=False)
+    
+    playlist = info['entries']#[0:qLen]  #list of song dicts with info
+
+    try:
+        playlistTitle = info['title']
+    except:
+        playlistTitle = "No Title"
+
+    playlist_Items = [] #playlist items to be returned
+    
+    for song in playlist:
+        item = {} #temp item to be copied into playlist items
+        item['audio'] =  song['url'] #get vid url
+        item['title'] =  song['title'] #get vid title
+        item['webpage'] = song['webpage_url'] #get vid title
+        item['duration'] = song['duration'] #get vid duration
+
+        playlist_Items.append(item)
+
+    return playlist_Items, playlistTitle
+    
+
 def makeString(args):
     text = "" #get text string from args
     for arg in args: 

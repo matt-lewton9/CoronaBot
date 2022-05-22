@@ -5,7 +5,7 @@ import os
 import time
 
 GREEN= 0x00D31F #hexidecimal color code constants
-QUEUE_LEN = 32 #Max number of songs that an be queued
+QUEUE_LEN = 16 #Max number of songs that an be queued
 
 class Musica(commands.Cog):
     def __init__(self, bot):
@@ -35,7 +35,6 @@ class Musica(commands.Cog):
 
     @commands.command(brief = 'Show queue', aliases=['queue']) #clear queue
     async def q(self, ctx):
-        
         fields = [] #fields array
         if len(self.queue) != 0:
             i = 0 #song counter
@@ -120,25 +119,53 @@ class Musica(commands.Cog):
 
         await self.play_next(ctx) #play next queued
 
-
     async def play_next(self, ctx): #play next song in queue
         voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild) #get voice client
         
         if len(self.queue) == 0: #if queue is empty, say so
             await ctx.send("Queue is empty")
             self.now_playing = 'None'
-            #await voice.disconnect() #leave call
+            await voice.disconnect() #leave call
 
         #else:
-        if not voice.is_playing():
+        elif not voice.is_playing():
             self.now_playing = self.queue[0] #set now playing
             self.queue.pop(0) #remove song from queue
-            #ic(self.now_playing['audio'])
             audio_source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(executable="C:/Users/black/ffmpeg/bin/ffmpeg.exe", source=self.now_playing['audio'])) #get audio source
             voice.play(audio_source, after = lambda error: self.bot.loop.create_task(self.play_next(ctx))) #play file
             embed = embedBuilder(title="Now Playing:", fields=[[self.now_playing['title'], self.now_playing['webpage'], False]]) #create embedded message
             self.now_playing["start_time"] = time.time() #set start time for song
             await ctx.send(embed = embed) #send embed message
+
+    @commands.command(brief="$playlist {/start-end/ or /start/} /url/ -> Queue an entire youtube playlist or specified range or staring song with it's url")
+    async def playlist(self, ctx, *args):
+        
+        if len(args) == 2: #if optional argument is included
+            input_url = args[1]
+            songNums = args[0]
+        else:            
+            input_url = args[0]
+            songNums = f"1-{QUEUE_LEN}" #otherwise, default to max songs
+        
+        playlist_Items, playlistTitle = getPlaylistItems(input_url, QUEUE_LEN, songNums) #get playlist list items from showwer helper
+
+        if playlist_Items == 1: #if url was invalud, throw error
+            await ctx.send("Invalid Url.")
+        elif playlist_Items == 2:
+            await ctx.send("Song indicies out of range.")
+        
+        else:
+            voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild) #get voice client
+            if voice == None: #if voice client doesn't exist
+                voice = await ctx.guild.voice_channels[0].connect() #Join VC, make voice client
+                    
+            self.queue = self.queue + playlist_Items #add all items to queue
+            embed = embedBuilder(title=f"Playlist {playlistTitle} with {len(playlist_Items)} Added to Queue", url=input_url)#make embed
+            await ctx.send(embed = embed) #send embed
+            await self.q(ctx)
+           
+            await self.play_next(ctx) #play next queued
+
 
 def setup(bot): #set up cog
     bot.add_cog(Musica(bot))
