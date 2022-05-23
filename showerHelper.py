@@ -26,15 +26,13 @@ def get_song(query):
     tmpFormat = ytdl_format_options.copy()
     tmpFormat['noplaylist'] = True #no playlists in search results options
 
-    if "https" in query: #remove playlist from url
+    if "https" in query and "&" in query: #remove playlist from url
         query = query[0:query.find('&')]
 
     ytdl = youtube_dl.YoutubeDL(tmpFormat)
     info = ytdl.extract_info(query, download=False)
     
     url = {} #make url object to store info abt video
-
-    ic(query)
 
     try:
         song = info['entries'][0]
@@ -86,7 +84,6 @@ def getPlaylistItems(input_url, qLen, songNums):
         playlist_Items.append(item)
 
     return playlist_Items, playlistTitle
-    
 
 def makeString(args):
     text = "" #get text string from args
@@ -112,9 +109,7 @@ def embedBuilder(title = None, description = None, fields = None, colour = 0x00D
     return embed #return embed
 
 def timeFormat(sec): #format seconds to HH:MM:SS
-    timeObjects = [sec / 3600, sec / 60, sec % 60]
-
-    timeObjects = [sec / 3600, sec / 60, sec % 60]
+    timeObjects = [int(sec / 3600), int(sec / 60), sec % 60]
 
     for idx in range(3):  #add zeros to time objects and save as strings
         time = timeObjects[idx]

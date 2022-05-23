@@ -64,6 +64,8 @@ def dad(msg):
             im_int = words.index(i)
             if words[im_int+1] in ['a', 'an', 'the']: 
                 output = "Hi " + words[im_int+2] + ", I'm dad."
+            elif words[im_int+1] == "not":
+                output = "Hi not " + words[im_int+2] + ", I'm dad."
             else:
                 output = "Hi " + words[im_int+1] + ", I'm dad."
     return output
