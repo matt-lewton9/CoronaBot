@@ -59,10 +59,6 @@ async def on_message(message): #scan message
     if "?" in message.content:
         await message.channel.send('no :heart:')
 
-    ### Bad Ellie... ###
-    if message.author.discriminator == "0773":
-            if ellieChecker(message):
-                await message.channel.send("Dear FBI, Consider this a disclamer that we are fully aware Ellie is a minor and any implications that may have.")
     
     ### Dadbot ###
     dad_joke = dad(message.content)
